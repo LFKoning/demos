@@ -112,43 +112,60 @@ def _():
         "Indicator 1.2.A": 3,
         "Indicator 2.A": 4,
     }
-    return
+    return (indicators,)
 
 
 @app.cell
 def _(BaseModel, Self):
     class ModelItem(BaseModel):
         name: str
-        weight: float | None = None
-        children: list[Self] = []
+        weight: float = 1.0
+        value: float | None = None
+        score: float | None = None
+
+        children: list[Self] | None = None
+
+        def resolve(self):
+            if self.children:
+                self.score = sum([child.resolve() for child in self.children])
+                return self.score
+            else:
+                self.score = self.weight * self.value
+                return self.score
     return (ModelItem,)
 
 
 @app.cell
-def _(ModelItem, blueprint):
-    # Build the tree in a forward pass.
-    mapping = {}
+def _(ModelItem, blueprint, indicators):
+    def make_items(name, weight=1.0):
+        if name in blueprint:
+            children = [
+                make_items(name=name, weight=weight) for name, weight in blueprint[name].items()
+            ]
+            return ModelItem(name=name, weight=weight, children=children)
 
+        elif name in indicators:
+            return ModelItem(name=name, weight=weight, value=indicators[name])
 
-    for name, children in blueprint.items():
-        if name not in mapping:
-            item = ModelItem(name=name)
-            mapping[name] = item
-        else:
-            item = mapping[name]
-
-        for name, weight in children.items():
-            child = ModelItem(name=name, weight=weight)
-            if name not in mapping:
-                mapping[name] = child
-            item.children.append(child)
-
-    return (mapping,)
+    return (make_items,)
 
 
 @app.cell
-def _(mapping):
-    mapping["Main"].children[0].children[0].children
+def _(make_items):
+    main_item = make_items("Main")
+    main_item.model_dump()
+    return (main_item,)
+
+
+@app.cell
+def _(main_item):
+    main_item.resolve()
+    return
+
+
+@app.cell
+def _(main_item):
+    main_item.model_dump()
     return
 
 
