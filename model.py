@@ -6,66 +6,7 @@ app = marimo.App(width="medium")
 
 @app.cell
 def _():
-    option_1 = """
-    Top level 1:
-        w: 0.5
-
-        Sub level 1.1:
-            w: 0.3
-
-            Indicator 1.1.A:
-                w: 0.2
-            Indicator 1.1.B:
-                w: 0.8
-
-        Sub level 1.2:
-            w: 0.7
-
-            Indicator 1.2.A:
-                w: 1.0
-
-    Top level 2:
-        w: 0.5
-
-        Indicator 2.A:
-            w: 1.0
-    """
-    return
-
-
-@app.cell
-def _():
-    option_2 = """
-    structure:
-        Top level 1:
-            Sub level 1.1:
-                Indicator 1.1.A
-                Indicator 1.1.B
-            Sub level 1.2:
-                Indicator 1.2.A
-        Top level 2:
-            Indicator 2.A
-
-    weights:
-        Top level 1:     0.5
-        Top level 2:     0.5
-
-        Sub level 1.1:   0.3
-        Sub level 1.2:   0.7
-
-        Indicator 1.1.A: 0.2
-        Indicator 1.1.B: 0.8
-
-        Indicator 1.2.A: 1.0
-
-        Indicator 2.A:   1.0
-    """
-    return
-
-
-@app.cell
-def _():
-    option_3 = """
+    blueprint_yaml = """
     Main:
         Top level 1: 0.5
         Top level 2: 0.5
@@ -84,7 +25,7 @@ def _():
     Top level 2:
         Indicator 2.A: 1.0
     """
-    return (option_3,)
+    return (blueprint_yaml,)
 
 
 @app.cell
@@ -97,8 +38,8 @@ def _():
 
 
 @app.cell
-def _(option_3, yaml):
-    blueprint = yaml.safe_load(option_3)
+def _(blueprint_yaml, yaml):
+    blueprint = yaml.safe_load(blueprint_yaml)
     blueprint
     return (blueprint,)
 
@@ -146,7 +87,6 @@ def _(ModelItem, blueprint, indicators):
 
         elif name in indicators:
             return ModelItem(name=name, weight=weight, value=indicators[name])
-
     return (make_items,)
 
 
