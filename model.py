@@ -23,7 +23,6 @@ def _():
         Top level 2: 0.5
 
     Top level 1:
-        _aggregate: mean
         Sub level 1.1: 0.3
         Sub level 1.2: 0.7
 
@@ -36,7 +35,10 @@ def _():
         Indicator 1.2.A: 1.0
 
     Top level 2:
-        Indicator 2.A: 1.0
+        _aggregate: mean
+        Indicator 2.A: 0.6
+        Indicator 2.B: 0.2
+        Indicator 2.C: 0.2
     """
     return (blueprint_yaml,)
 
@@ -56,6 +58,8 @@ def _():
         "Indicator 1.1.B": 2,
         "Indicator 1.2.A": 3,
         "Indicator 2.A": None,
+        "Indicator 2.B": 4,
+        "Indicator 2.C": 5,
     }
     return (indicators,)
 
@@ -157,7 +161,7 @@ def _(ModelItem, blueprint, indicators):
                 else:
                     print(f"- Processing child: {child}")
                     children.append(build_tree(name=child, weight=setting, aggregate=aggregate, fillna=fillna))
-        
+
             return ModelItem(name=name, weight=weight, children=children, _aggregate=self_aggregate, _fillna=self_fillna)
 
         elif name in indicators:
